@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+my $conffile = glob('~/.ebGit');
+
+while(1) {
+	open my $conf, $conffile or die "Could not open $conffile: $!";
+	while(<$conf>)  {   
+	   	chomp;
+		my $repo = $_;
+		print "syncing -- $repo\n";    
+	        `git pull `;	
+        	`git commit -a .`;
+	        `git push `;
+	}
+	close $conf;
+	sleep 1600;
+}
+
