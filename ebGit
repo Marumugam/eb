@@ -4,18 +4,36 @@ use strict;
 use warnings;
 
 my $conffile = glob('~/.ebGit');
+chomp(my $prompt = `basename $0`);
 
 while(1) {
-	open my $conf, $conffile or die "Could not open $conffile: $!";
-	while(<$conf>)  {   
-	   	chomp;
-		my $repo = $_;
-		print "syncing -- $repo\n";    
-	        `git pull `;	
-        	`git commit -a .`;
-	        `git push `;
+    open my $conf, $conffile or die "Could not open $conffile: $!";
+    while(<$conf>)  {   
+	chomp;
+	if (/^$/ or /^ *$/) {
+	    next;
+	} else {
+	    my $repo = $_;
+	    print "$prompt>>------------------------------------------------------------\n";
+	    print "$prompt>> syncing -- " . `basename $repo` . "\n";
+	    
+	    chdir(glob($repo)) and                       \
+		print "$prompt>>" . `basename \`pwd\`` and             \
+		print "$prompt>> git pull\n"      and             \  
+		print `git pull `        and             \
+		print "$prompt>> git add .\n"     and             \
+		print `git add .`        and             \
+		print "$prompt>> git status\n"    and             \
+		print `git status`       and             \
+		print "$prompt>> git commit -m \"update from $0\"\n" and \
+		print `git commit -m "update from $0"` and\
+		print "$prompt>> git push\n"     and 
+		print `git push `;
+	    print "------------------------------------------------------------\n";
+	    $repo = "";
 	}
-	close $conf;
-	sleep 1600;
+    }
+    close $conf;
+    sleep 1;
 }
 
